@@ -150,7 +150,7 @@ func (ss *openTracingServerStream) Context() context.Context {
 }
 
 func extractSpanContext(ctx context.Context, tracer opentracing.Tracer) (opentracing.SpanContext, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
+	md, ok := metadata.FromContext(ctx)
 	if !ok {
 		md = metadata.New(nil)
 	}

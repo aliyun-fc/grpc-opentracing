@@ -1,6 +1,11 @@
 package otgrpc
 
-import "github.com/opentracing/opentracing-go"
+import (
+	"context"
+
+	"github.com/opentracing/opentracing-go"
+	"google.golang.org/grpc"
+)
 
 // Option instances may be used in OpenTracing(Server|Client)Interceptor
 // initialization.
