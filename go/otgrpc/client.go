@@ -53,7 +53,7 @@ func OpenTracingClientInterceptor(tracer opentracing.Tracer, optFuncs ...Option)
 			gRPCComponentTag,
 		)
 		defer clientSpan.Finish()
-		ctx = injectSpanContext(ctx, tracer, clientSpan)
+		ctx = injectSpanContext(ctx, tracer, clientSpan, otgrpcOpts)
 		if otgrpcOpts.logPayloads {
 			clientSpan.LogFields(log.Object("gRPC request", req))
 		}
@@ -115,7 +115,7 @@ func OpenTracingStreamClientInterceptor(tracer opentracing.Tracer, optFuncs ...O
 			ext.SpanKindRPCClient,
 			gRPCComponentTag,
 		)
-		ctx = injectSpanContext(ctx, tracer, clientSpan)
+		ctx = injectSpanContext(ctx, tracer, clientSpan, otgrpcOpts)
 		cs, err := streamer(ctx, desc, cc, method, opts...)
 		if err != nil {
 			if otgrpcOpts.logError {
@@ -224,8 +224,8 @@ func (cs *openTracingClientStream) CloseSend() error {
 	return err
 }
 
-func injectSpanContext(ctx context.Context, tracer opentracing.Tracer, clientSpan opentracing.Span) context.Context {
-	md, ok := metadata.FromOutgoingContext(ctx)
+func injectSpanContext(ctx context.Context, tracer opentracing.Tracer, clientSpan opentracing.Span, otgrpcOpts *options) context.Context {
+	md, ok := metadata.FromContext(ctx)
 	if !ok {
 		md = metadata.New(nil)
 	} else {
@@ -237,5 +237,5 @@ func injectSpanContext(ctx context.Context, tracer opentracing.Tracer, clientSpa
 	if err != nil && otgrpcOpts.logError {
 		clientSpan.LogFields(log.String("event", "Tracer.Inject() failed"), log.Error(err))
 	}
-	return metadata.NewOutgoingContext(ctx, md)
+	return metadata.NewContext(ctx, md)
 }
