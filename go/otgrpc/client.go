@@ -46,7 +46,9 @@ func OpenTracingClientInterceptor(tracer opentracing.Tracer, optFuncs ...Option)
 			!otgrpcOpts.inclusionFunc(parentCtx, method, req, resp) {
 			return invoker(ctx, method, req, resp, cc, opts...)
 		}
-		clientSpan := tracer.StartSpan(
+		clientSpan := StartSpanFactory(
+			parentCtx,
+			tracer,
 			method,
 			opentracing.ChildOf(parentCtx),
 			ext.SpanKindRPCClient,
@@ -109,7 +111,9 @@ func OpenTracingStreamClientInterceptor(tracer opentracing.Tracer, optFuncs ...O
 			return streamer(ctx, desc, cc, method, opts...)
 		}
 
-		clientSpan := tracer.StartSpan(
+		clientSpan := StartSpanFactory(
+			parentCtx,
+			tracer,
 			method,
 			opentracing.ChildOf(parentCtx),
 			ext.SpanKindRPCClient,
