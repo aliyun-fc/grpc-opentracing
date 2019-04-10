@@ -11,7 +11,11 @@ import (
 var (
 	// Morally a const:
 	gRPCComponentTag = opentracing.Tag{string(ext.Component), "gRPC"}
+
+	// StartSpanFactory ...
+	StartSpanFactory = defaultStartSpan
 )
+
 
 // metadataReaderWriter satisfies both the opentracing.TextMapReader and
 // opentracing.TextMapWriter interfaces.
@@ -39,4 +43,12 @@ func (w metadataReaderWriter) ForeachKey(handler func(key, val string) error) er
 	}
 
 	return nil
+}
+
+func defaultStartSpan(
+	spanContext opentracing.SpanContext,
+	tracer opentracing.Tracer,
+	operationName string,
+	opts ...opentracing.StartSpanOption) opentracing.Span {
+	return tracer.StartSpan(operationName, opts...)
 }
